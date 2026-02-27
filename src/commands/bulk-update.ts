@@ -2,7 +2,7 @@ import type { Command } from 'commander'
 import { buildContext } from '../cli.js'
 import { jsonOut, log } from '../utils/output.js'
 import { parseDataArg } from '../utils/parse-data.js'
-import { classifyFetchError, ConfigError, PartialFailureError } from '../utils/errors.js'
+import { classifyFetchError, ConfigError, EXIT_PARTIAL, PartialFailureError } from '../utils/errors.js'
 import { enforceProdGuard } from '../utils/prod-guard.js'
 import { JournalWriter } from '../journal/writer.js'
 
@@ -99,18 +99,29 @@ export function registerBulkUpdate(program: Command): void {
           }
         }
 
-        const summary = journal.summary()
-        if (flags.json) {
-          jsonOut(summary)
-        } else {
-          log.info(`Bulk update complete: ${summary.succeeded} succeeded, ${summary.failed} failed`)
+        const summary = {
+          ...journal.summary(),
+          collection,
+          matchedDocs: totalDocs,
+          cappedAt: limit,
+          sampleIds: docs.slice(0, 5).map((d) => d.id),
         }
 
         if (summary.failed > 0) {
+          if (flags.json) {
+            jsonOut({ exitCode: EXIT_PARTIAL, ...summary })
+            process.exit(EXIT_PARTIAL)
+          }
           throw new PartialFailureError(
             `${summary.failed} of ${summary.touched} updates failed`,
             summary.errors,
           )
+        }
+
+        if (flags.json) {
+          jsonOut(summary)
+        } else {
+          log.info(`Bulk update complete: ${summary.succeeded} succeeded, ${summary.failed} failed`)
         }
       } catch (err) {
         if (err instanceof PartialFailureError) throw err
