@@ -1,0 +1,41 @@
+{
+  "name": "payloadx-cli",
+  "version": "1.0.0",
+  "description": "CLI for Payload CMS — non-interactive REST API client for automation and bots",
+  "type": "module",
+  "bin": {
+    "payloadx": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "keywords": [
+    "payload",
+    "payloadcms",
+    "cli",
+    "rest-api",
+    "automation"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@payloadcms/sdk": "3.77.0",
+    "commander": "^13.1.0",
+    "qs-esm": "^7.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
