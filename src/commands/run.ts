@@ -11,7 +11,7 @@ import { JournalWriter } from '../journal/writer.js'
 function resolveScript(script: string): string {
   if (existsSync(script)) return resolve(script)
 
-  const extensions = ['.ts', '.js', '.mjs']
+  const extensions = ['.js', '.mjs']
   const dirs = [
     resolve(process.cwd(), 'payloadx', 'scripts'),
     resolve(process.cwd(), '.payloadx', 'scripts'),
@@ -45,8 +45,10 @@ export function registerRun(program: Command): void {
       const scriptPath = resolveScript(script)
       const ext = extname(scriptPath)
 
-      if (ext === '.ts') {
-        log.warn('TypeScript scripts require a Node loader (e.g. tsx). Attempting import...')
+      if (ext === '.ts' || ext === '.tsx') {
+        throw new ConfigError(
+          `TypeScript scripts are not supported directly. Compile to .js first or run via: npx tsx ${scriptPath}`,
+        )
       }
 
       try {
