@@ -131,10 +131,10 @@ Find documents. Supports `--where`, `--limit`, `--page`, `--depth`, `--sort`, `-
 Get a single document by ID. Supports `--depth`, `--locale`, `--draft`.
 
 ### `payloadx create <collection>`
-Create a document. Requires `--data`. Dry-run by default.
+Create a document. Requires `--data` and/or `--file`. Dry-run by default. Use `--file` for upload collections (e.g. `media`).
 
 ### `payloadx update <collection> <id>`
-Update a document by ID. Requires `--data`. Dry-run shows a diff of changed fields.
+Update a document by ID. Requires `--data` and/or `--file`. Dry-run shows a diff of changed fields. Use `--file` to replace the file on upload collections.
 
 ### `payloadx delete <collection> <id>`
 Delete a document by ID. Dry-run confirms existence.
@@ -180,6 +180,26 @@ export default async function main(ctx: {
 | 4 | Network error |
 | 5 | Server error (5xx) |
 | 6 | Partial failure (bulk ops) |
+
+## File Uploads
+
+Upload collections (like `media`) support the `--file` flag on `create` and `update`:
+
+```bash
+# Upload a local image
+payloadx create media --file ./hero.png --data '{"alt":"Hero image"}' --apply --allow-prod --json
+
+# Upload from a URL (SDK fetches it)
+payloadx create media --file "https://example.com/photo.jpg" --data '{"alt":"Photo"}' --apply --allow-prod --json
+
+# Replace an existing media file
+payloadx update media 6 --file ./new-hero.png --apply --allow-prod --json
+
+# Update metadata only (no file change)
+payloadx update media 6 --data '{"alt":"Updated alt text"}' --apply --allow-prod --json
+```
+
+Supported file types: png, jpg/jpeg, gif, webp, svg, avif, pdf, mp4, webm, mp3, and more.
 
 ## Where Queries
 
